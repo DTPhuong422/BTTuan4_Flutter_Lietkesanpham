@@ -19,7 +19,26 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: ProductListScreen(),
+      home: HomeSreen(),
+      //ProductListScreen(),
+    );
+  }
+}
+class HomeSreen extends StatelessWidget{
+  @override
+  Widget build(BuildContext context){
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Trang chủ"),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=> ProductListScreen()),);
+          },
+          child: Text('Go to ProductListSreen'),
+        ),
+      ),
     );
   }
 }
@@ -55,7 +74,7 @@ class _ProductListScreenState extends State<ProductListScreen>{
   //--
   Future<void> fetchProducts() async {
     final response = await http.get(
-        Uri.parse("http://172.16.8.112/aserver/api.php"));
+        Uri.parse("http://192.168.0.104/aserver/api.php"));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       setState(() {
