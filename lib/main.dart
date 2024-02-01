@@ -111,6 +111,12 @@ class _ProductListScreenState extends State<ProductListScreen>{
                   height: 50,
                   fit: BoxFit.cover,
                 ),
+                onTap: (){
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context)=> ProductDetailScreen(products[index], products),
+                      ),
+                  );
+                },
               );
             },
         )
@@ -120,6 +126,115 @@ class _ProductListScreenState extends State<ProductListScreen>{
     );
   }
 }
+class ProductDetailScreen extends StatelessWidget {
+  final Product product;
+  final List<Product> products;
+  ProductDetailScreen(this.product, this.products);
+
+  @override
+  Widget build(BuildContext context){
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Product Detail'),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              cartManager.addItem(CartItem(styleid: product.styleid, price: product.price));
+              Navigator.push(context,
+              MaterialPageRoute(
+                  builder: (context)=> CartScreen(cartManager,products),
+              ),
+              );
+          },
+          child: Icon(Icons.shopping_cart),
+          style: ElevatedButton.styleFrom(
+              shape: CircleBorder(),
+              padding: EdgeInsets.all(0)
+          ),
+          ),
+        ],
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(padding: const EdgeInsets.all(8),
+          child: Text('Brand: ${product.brands_filter_facet}'),
+          ),
+          Image.network(product.search_image),
+          Padding(padding: const EdgeInsets.all(8),
+            child: Text('Info: ${product.product_additional_info}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Padding(padding: const EdgeInsets.all(8),
+            child: Text('ID: ${product.styleid}'),
+          ),
+          Padding(padding: const EdgeInsets.all(8),
+          child: Text('Price: ${product.price}'),)
+        ],
+      ),
+    );
+  }
+}
+class CartManager {
+  List<CartItem> items = [];
+
+  void addItem(CartItem item) {
+    items.add(item);
+  }
+  int get itemCount => items.length;
+  double get total => items.fold(0, (sum, item) => sum + double.parse(item.price));
+}
+final cartManager = CartManager();
+
+class CartScreen extends StatelessWidget {
+  final CartManager cartManager;
+  final List<Product> products;
+  CartScreen(this.cartManager, this.products);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Shopping Cart"),
+      ),
+      body: ListView.builder(
+        itemCount: cartManager.itemCount,
+        itemBuilder: (context, index) {
+          final cartItem = cartManager.items[index];
+          return ListTile(
+              title: Text(products[index].brands_filter_facet),
+          subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Text('Price: ${products[index].price}'),
+          Text('product_additional_info: ${products[index].product_additional_info}'),
+          ],
+          ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class CartItem {
+  String styleid;
+  String price;
+  CartItem({
+    required this.styleid,
+    required this.price,
+  });
+}
+String getProductName(String styleId, List<Product> products) {
+  // Tìm kiếm sản phẩm theo styleId
+  Product? product = products.firstWhere((product) => product.styleid == styleId);
+
+  // Nếu tìm thấy sản phẩm, trả về tên sản phẩm; nếu không, trả về "Unknown"
+  return product != null ? product.product_additional_info : 'Unknown';
+}
+
+
 //---
 class Product {
   String search_image;
